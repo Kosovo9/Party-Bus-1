@@ -24,7 +24,7 @@ const AIAgents: React.FC = () => {
   };
 
   return (
-    <section id="ai-planner" class="py-20 bg-slate-900">
+    <section id="ai-planner" className="py-20 bg-slate-900">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-4 neon-glow-purple">
           AI PARTY PLANNER

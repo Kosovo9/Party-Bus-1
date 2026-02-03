@@ -193,6 +193,11 @@ const App: React.FC = () => {
 
   const handleVisualize = async (service: ExtendedService) => {
     const aistudio = (window as any).aistudio;
+    if (!aistudio) {
+      alert("Configurando servicios de IA... Por favor espera un momento.");
+      return;
+    }
+
     const hasKey = await aistudio.hasSelectedApiKey();
     if (!hasKey) {
       await aistudio.openSelectKey();
