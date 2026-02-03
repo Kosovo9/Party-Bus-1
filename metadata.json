@@ -1,0 +1,7 @@
+{
+  "name": "PartyBus GDL - Luxury Nightlife Experience",
+  "description": "The ultimate luxury party bus experience in Guadalajara and Zapopan. High-end transportation for birthdays, weddings, tequila tours, and VIP nights.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
