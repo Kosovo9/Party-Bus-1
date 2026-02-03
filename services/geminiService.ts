@@ -3,7 +3,6 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 const GLOBAL_NEGATIVE_PROMPT = "no logos reales, no marcas registradas, no texto legible, no nombres de empresas, no placas de vehículos detalladas, no caras hiperrealistas de personas famosas, no violencia, no armas, no contenido sexual, no desnudos, no gestos ofensivos, no escenas borrosas, no ojos deformes, no manos deformes, no proporciones corporales extrañas, no baja resolución, no ruido digital excesivo, no estilo caricatura, no ilustración, no 3D, solo fotografía hiperrealista limpia y bien iluminada";
 
-// analyzeGroupPhoto uses gemini-3-pro-preview to evaluate the group's needs based on their photo
 export const analyzeGroupPhoto = async (base64Image: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -23,7 +22,25 @@ export const analyzeGroupPhoto = async (base64Image: string) => {
   }
 };
 
-// generateServiceVisual uses gemini-3-pro-image-preview for high quality visual previews of the services
+export const validateCommunityPhoto = async (base64Image: string) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite-latest',
+      contents: {
+        parts: [
+          { inlineData: { data: base64Image, mimeType: 'image/jpeg' } },
+          { text: "Is this a photo of a party, group of friends, or a nightlife scene suitable for a luxury party bus gallery? Respond with ONLY 'TRUE' or 'FALSE'." }
+        ]
+      }
+    });
+    return response.text?.trim().toUpperCase() === 'TRUE';
+  } catch (error) {
+    console.error("Gemini Validation Error:", error);
+    return false;
+  }
+};
+
 export const generateServiceVisual = async (prompt: string, specificNegative?: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -31,7 +48,6 @@ export const generateServiceVisual = async (prompt: string, specificNegative?: s
       ? `${GLOBAL_NEGATIVE_PROMPT}, ${specificNegative}` 
       : GLOBAL_NEGATIVE_PROMPT;
 
-    // Use gemini-3-pro-image-preview for high-quality visualizations which require a user-selected API key
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-image-preview',
       contents: {
@@ -47,7 +63,6 @@ export const generateServiceVisual = async (prompt: string, specificNegative?: s
       },
     });
 
-    // Extract the image from the response parts
     for (const part of response.candidates?.[0]?.content?.parts || []) {
       if (part.inlineData) {
         return `data:image/png;base64,${part.inlineData.data}`;
@@ -56,7 +71,6 @@ export const generateServiceVisual = async (prompt: string, specificNegative?: s
     return null;
   } catch (error: any) {
     console.error("Image Generation Error:", error);
-    // Gracefully handle key-related errors by signaling the UI to prompt for a new key
     if (error.message?.includes("entity was not found") || error.message?.includes("permission denied")) {
       return "KEY_ERROR";
     }
@@ -64,7 +78,6 @@ export const generateServiceVisual = async (prompt: string, specificNegative?: s
   }
 };
 
-// editPartyPhoto uses gemini-2.5-flash-image for real-time image editing
 export const editPartyPhoto = async (base64Image: string, prompt: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
